@@ -47,10 +47,10 @@ int Form::getRequiredToExec() const
 	return (_requiredToExec);
 }
 
-std::ostream& operator<<(std::ostream& out, const Form& form)
+std::ostream& operator<<(std::ostream& out, const Form& Form)
 {
-	out << "Form: " << form.getName() << std::endl <<
-	"Signed: " << form.getSigned() << std::endl;
+	out << "Form: " << Form.getName() << std::endl <<
+	"Signed: " << Form.getSigned() << std::endl;
 
 	return (out);
 

@@ -54,7 +54,7 @@ void copyTest()
 //muthu 2
 //ahhock 150
 
-void formTest()
+void FormTest()
 {
 	try
 	{
@@ -104,7 +104,7 @@ int main()
 	copyTest();
 	std::cout << std::endl;
 
-	formTest();
+	FormTest();
 
 	std::cout << std::endl;
 	return(0);
