@@ -11,7 +11,7 @@ class AForm
 {
 	public:
 		AForm(std::string name, int toSign, int toExec);
-		~AForm();
+		virtual ~AForm();
 		AForm(const AForm& other);
 		
 		const std::string	getName() const;

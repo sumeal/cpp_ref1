@@ -12,7 +12,7 @@ class ShrubberyCreationForm : public AForm
 		ShrubberyCreationForm(std::string target);
 		~ShrubberyCreationForm();
 		ShrubberyCreationForm(ShrubberyCreationForm& other);
-		void	activity();
+		void	activity() const;
 		std::string getTarget();
 	private:
 		std::string _target;

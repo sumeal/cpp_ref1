@@ -1,4 +1,4 @@
-#include "ShrubberyCreationFarm.hpp"
+#include "ShrubberyCreationForm.hpp"
 
 ShrubberyCreationForm::ShrubberyCreationForm(std::string target) : AForm("ShrubberyCreationForm", 145, 137), _target(target)
 {
@@ -17,7 +17,7 @@ std::string ShrubberyCreationForm::getTarget()
 	return (_target);
 }
 
-void ShrubberyCreationForm::activity()
+void ShrubberyCreationForm::activity() const
 {
 	std::ofstream out;
 
