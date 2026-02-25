@@ -15,8 +15,8 @@ int main(int argc, char **argv)
 	+inf
 	-inf
 	nan
-	+inff
-	-inff
+	+inff--------------impossible why
+	-inff--------------impossible why
 	nanf
 
 

@@ -40,15 +40,17 @@ bool ValidNum(std::string input)
 
 int FindType(std::string input)
 {
+	if (input.length() == 1 && isdigit(input[0]))
+		return (INT);
 	if (input.length() == 0)
 		return (ERROR);
 	if (!input.compare("-inff") || !input.compare("+inff") || !input.compare("nanf"))
 		return (FLOAT);
 	if (!input.compare("-inf") || !input.compare("+inf") || !input.compare("nan"))
 		return (DOUBLE);
-	if (input.length() == 1 && isalpha(input[0]))
+	if (input.length() == 1 && isprint(input[0]))
 		return (CHAR);
-	if (input[input.length() - 1] == 'f')
+	if (input[input.length() - 1] == 'f' || input[input.length() - 1] == 'F')
 	{
 		std::string num = input.substr(0, input.length() - 1);
 		if (ValidNum(num))
@@ -66,7 +68,7 @@ int FindType(std::string input)
 void PrintValue(char c, int i, float f, double d)
 {
 	if (i >= 0 && i <= 127 && isprint(static_cast<unsigned char>(i)))
-		std::cout << "char: " << c << std::endl;
+		std::cout << "char: '" << c << "'" << std::endl;
 	else if (isascii(i))
 		std::cout << "char: non displayable" << std::endl;
 	else
@@ -125,15 +127,6 @@ void ScalarConverter::convert(std::string input)
 		{
 			char *end;
 			errno = 0;
-			double f2 = strtof(input.c_str(), &end);
-			if (errno == ERANGE || f2 > FLT_MAX || f2 < -FLT_MAX)
-			{
-				std::cout << "char: impossible\n";
-				std::cout << "int: impossible\n";
-				std::cout << "float: impossible" << std::endl;
-				std::cout << "double: " << f2 << "\n";
-				return;
-			}
 			f = strtof(input.c_str(), &end);
 			if (std::isnan(f) || std::isinf(f))
 			{
@@ -141,6 +134,15 @@ void ScalarConverter::convert(std::string input)
 				std::cout << "int: impossible" << std::endl;
 				std::cout << "float: " << f << "f" << std::endl;
 				std::cout << "double: " << static_cast<float>(f) << std::endl;
+				return;
+			}
+			double f2 = strtof(input.c_str(), &end);
+			if (errno == ERANGE || f2 > FLT_MAX || f2 < -FLT_MAX)
+			{
+				std::cout << "char: impossible\n";
+				std::cout << "int: impossible\n";
+				std::cout << "float: impossible" << std::endl;
+				std::cout << "double: " << f2 << "\n";
 				return;
 			}
 			PrintValue(static_cast<char>(f), static_cast<int>(f), f, static_cast<double>(f));
@@ -170,5 +172,9 @@ void ScalarConverter::convert(std::string input)
 			PrintValue(static_cast<char>(d), static_cast<int>(d), static_cast<float>(d), d);
 			return;
 		}
+		default:
+		{
+			std::cout << FindType(input) << std::endl;
+ 		}
 	}
 }
