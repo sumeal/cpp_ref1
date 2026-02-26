@@ -9,6 +9,7 @@
  #include <cmath>
  #include <cerrno>
  #include <cfloat>
+ #include <limits>
 
 
  enum {

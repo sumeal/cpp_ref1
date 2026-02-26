@@ -44,9 +44,9 @@ int FindType(std::string input)
 		return (INT);
 	if (input.length() == 0)
 		return (ERROR);
-	if (!input.compare("-inff") || !input.compare("+inff") || !input.compare("nanf"))
+	if (!input.compare("-inff") || !input.compare("inff") || !input.compare("+inff") || !input.compare("nanf"))
 		return (FLOAT);
-	if (!input.compare("-inf") || !input.compare("+inf") || !input.compare("nan"))
+	if (!input.compare("-inf") || !input.compare("inf") || !input.compare("+inf") || !input.compare("nan"))
 		return (DOUBLE);
 	if (input.length() == 1 && isprint(input[0]))
 		return (CHAR);
@@ -70,7 +70,7 @@ void PrintValue(char c, int i, float f, double d)
 	if (i >= 0 && i <= 127 && isprint(static_cast<unsigned char>(i)))
 		std::cout << "char: '" << c << "'" << std::endl;
 	else if (isascii(i))
-		std::cout << "char: non displayable" << std::endl;
+		std::cout << "char: Non displayable" << std::endl;
 	else
 		std::cout << "char: impossible" << std::endl;
 
@@ -103,7 +103,7 @@ void ScalarConverter::convert(std::string input)
 		case CHAR:
 		{
 			c = input[0];
-			PrintValue(c, static_cast<int>(c), static_cast<float>(c), static_cast<double>(c));
+			PrintValue(c, c, c, c);
 			return;
 		}
 		case INT:
@@ -111,7 +111,7 @@ void ScalarConverter::convert(std::string input)
 			char *end;
 			errno = 0;
 			long value = strtol(input.c_str(), &end, 10);
-			if (errno == ERANGE || value > INT_MAX || value < INT_MIN)
+			if (value > std::numeric_limits<int>::max() || value < std::numeric_limits<int>::min())
 			{
 				std::cout << "char: impossible\n";
 				std::cout << "int: impossible\n";
@@ -120,7 +120,7 @@ void ScalarConverter::convert(std::string input)
 				return;
 			}
 			i = static_cast<int>(value);
-			PrintValue(static_cast<char>(i), i, static_cast<float>(i), static_cast<double>(i));
+			PrintValue(static_cast<char>(i), i, i, i);
 			return;
 		}
 		case FLOAT:
@@ -136,8 +136,8 @@ void ScalarConverter::convert(std::string input)
 				std::cout << "double: " << static_cast<float>(f) << std::endl;
 				return;
 			}
-			double f2 = strtof(input.c_str(), &end);
-			if (errno == ERANGE || f2 > FLT_MAX || f2 < -FLT_MAX)
+			double f2 = strtod(input.c_str(), &end);
+			if (f2 > std::numeric_limits<float>::max() || f2 < -std::numeric_limits<float>::max())
 			{
 				std::cout << "char: impossible\n";
 				std::cout << "int: impossible\n";
@@ -145,7 +145,7 @@ void ScalarConverter::convert(std::string input)
 				std::cout << "double: " << f2 << "\n";
 				return;
 			}
-			PrintValue(static_cast<char>(f), static_cast<int>(f), f, static_cast<double>(f));
+			PrintValue(static_cast<char>(f), static_cast<int>(f), f, f);
 			return;
 		}
 		case DOUBLE:
@@ -153,14 +153,6 @@ void ScalarConverter::convert(std::string input)
 			char *end;
 			errno = 0;
 			d = strtod(input.c_str(), &end);
-			if (errno == ERANGE)
-			{
-				std::cout << "char: impossible\n";
-				std::cout << "int: impossible\n";
-				std::cout << "float: impossible\n";
-				std::cout << "double: impossible" << "\n";
-				return;
-			}
 			if (std::isnan(d) || std::isinf(d))
 			{
 				std::cout << "char: impossible" << std::endl;
@@ -169,12 +161,24 @@ void ScalarConverter::convert(std::string input)
 				std::cout << "double: " << d << std::endl;
 				return;
 			}
+			long double f2 = strtold(input.c_str(), &end);
+			if (f2 > std::numeric_limits<double>::max() || f2 < -std::numeric_limits<double>::max())
+			{
+				std::cout << "char: impossible" << std::endl;
+				std::cout << "int: impossible" << std::endl;
+				std::cout << "float: impossible" << std::endl;
+				std::cout << "double: impossible" << std::endl;
+				return;
+			}
 			PrintValue(static_cast<char>(d), static_cast<int>(d), static_cast<float>(d), d);
 			return;
 		}
-		default:
+		case ERROR:
 		{
-			std::cout << FindType(input) << std::endl;
- 		}
+			std::cout << "char: impossible" << std::endl;
+			std::cout << "int: impossible" << std::endl;
+			std::cout << "float: impossible" << std::endl;
+			std::cout << "double: impossible" << std::endl;
+		}
 	}
 }
