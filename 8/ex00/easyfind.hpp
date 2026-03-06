@@ -5,6 +5,8 @@
  #include <algorithm>
  #include <vector>
  #include <iostream>
+ #include <deque>
+ #include <list>
 
 class NotFoundException : public std::exception
 {
