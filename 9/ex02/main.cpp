@@ -1,75 +1,61 @@
 #include "PMergeMe.hpp"
+#include <sys/time.h>
+#include <iostream>
+#include <vector>
+#include <iomanip>
 
-bool isNumber(std::string arv)
-{
-	if (arv.find_first_not_of("0123456789") == std::string::npos)
-		return (true);
-	else
-		return (false);
+long long get_time_us() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (static_cast<long long>(tv.tv_sec) * 1000000) + tv.tv_usec;
 }
 
-int main(int ac, char **av)
-{
-	if (ac == 1)
-	{
-		std::cout << "Error: please provide numbers" << std::endl;
-		exit(1);
-	}
-	if (ac == 2)
-	{
-		std::cout << "Error: only 1 number" << std::endl;
-		exit (1);
-	}
+int main(int ac, char **av) {
+    if (ac < 2) {
+        std::cerr << "Error: No numbers provided." << std::endl;
+        return 1;
+    }
 
-	std::string argv;
-	std::vector<int> ori;
+    std::vector<int> input_data;
+    for (int i = 1; i < ac; i++) {
+        char *endptr;
+        long val = std::strtol(av[i], &endptr, 10);
+        if (*endptr != '\0' || val < 0) {
+            std::cerr << "Error: Invalid input '" << av[i] << "'" << std::endl;
+            return 1;
+        }
+        input_data.push_back(static_cast<int>(val));
+    }
 
-	for (int i = 1; i < ac; i++)
-	{
-		argv = av[i];
-		if (isNumber(argv) == true)
-			ori.push_back(std::atoi(argv.c_str()));
-		else
-		{
-			std::cout << "Error, invalid arguments" << std::endl;
-			exit(1);
-		}
-	}
+    PMergeMe pmm;
+    pmm.insertVec(input_data);
+    pmm.insertList(input_data);
 
-	PMergeMe merge;
-	merge.insertVec(ori);
-	merge.insertList(ori);
+    std::cout << "Before: ";
+    pmm.printVec(); // Assuming this prints the unsorted state
+    std::cout << std::endl;
 
-	std::cout << "before: ";
-	merge.printVec();
-	std::cout << std::endl;
+    // --- Vector Timing ---
+    long long start = get_time_us();
+    pmm.sortVec();
+    long long end = get_time_us();
+    long long timeVec = end - start;
 
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	unsigned long startSec = tv.tv_sec;
-	unsigned long startMicro = tv.tv_usec;
+    // --- List Timing ---
+    start = get_time_us();
+    pmm.sortList();
+    end = get_time_us();
+    long long timeList = end - start;
 
-	merge.sortVec();
-	gettimeofday(&tv,NULL);
-	float endSec = tv.tv_sec;
-	float endMicro = tv.tv_usec;
-	float time = float(endSec - startSec) + (float)((endMicro = startMicro) / 10000);
-	std::cout << "after: ";
-	merge.printVec();
-	std::cout << std::endl;
-	std::cout << "Time to process a range of " << ac - 1 << " elements with std::vector : " << time << " µs " << std::endl;
+    std::cout << "After:  ";
+    pmm.printVec();
+    std::cout << std::endl;
 
-	gettimeofday(&tv, NULL);
-	startSec = tv.tv_sec;
-	startMicro = tv.tv_usec;
+    std::cout << "Time to process a range of " << input_data.size() 
+              << " elements with std::vector : " << timeVec << " us" << std::endl;
+    std::cout << "Time to process a range of " << input_data.size() 
+              << " elements with std::list   : " << timeList << " us" << std::endl;
 
-	merge.sortList();
-
-	gettimeofday(&tv, NULL);
-	endSec = tv.tv_sec;
-	endMicro = tv.tv_usec;
-	time = float(endSec - startSec) + (float)((endMicro - startMicro) / 10000);
-	std::cout << "Time to process a range of " << ac - 1 << " elements with std::list : " << time << " µs" << std::endl;
-
-	merge.checkSorted();
+    pmm.checkSorted();
+    return 0;
 }

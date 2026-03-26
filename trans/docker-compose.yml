@@ -1,0 +1,68 @@
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: transcendence-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-transcendence}
+      MYSQL_USER: ${DB_USER:-transcendence}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-transcendence_pass}
+      MYSQL_INITDB_SKIP_TZINFO: 'yes'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - transcendence-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  # Go Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: transcendence-backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-transcendence}
+      DB_PASSWORD: ${DB_PASSWORD:-transcendence_pass}
+      DB_NAME: ${DB_NAME:-transcendence}
+      SERVER_PORT: 8080
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - transcendence-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: transcendence-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - transcendence-network
+
+volumes:
+  mysql_data:
+
+networks:
+  transcendence-network:
+    driver: bridge

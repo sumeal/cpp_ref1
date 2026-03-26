@@ -186,7 +186,7 @@ void PMergeMe::sortVec()
 		_vec.insert(std::lower_bound(_vec.begin(), _vec.end(), *it), *it);
 	}
 
-	if (hasStraggler = true)
+	if (hasStraggler == true)
 		_vec.insert(std::lower_bound(_vec.begin(), _vec.end(), straggler), straggler);
 }
 
