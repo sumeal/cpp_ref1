@@ -17,7 +17,7 @@ func (r *Repository) CreateUser(req RegisterRequest) (int64, error) {
 	// In production, ALWAYS hash passwords using bcrypt
 	avatar := "https://ui-avatars.com/api/?name=" + req.FirstName + "+" + req.LastName
 	result, err := r.db.Exec(
-		"INSERT INTO users (username, email, password_hash, first_name, last_name, avatar_url, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO users (username, email, password_hash, first_name, last_name, avatar_url, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		req.Username, req.Email, req.Password, req.FirstName, req.LastName, avatar, true,
 	)
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *Repository) GetUserByEmailAndPassword(email, password string) (*User, e
 	var bio sql.NullString
 	var avatarURL sql.NullString
 	err := r.db.QueryRow(
-		"SELECT id, username, email, first_name, last_name, avatar_url, bio, created_at FROM users WHERE email = ? AND password_hash = ?",
+		"SELECT id, username, email, first_name, last_name, avatar_url, bio, created_at FROM users WHERE email = $1 AND password_hash = $2",
 		email, password,
 	).Scan(&user.ID, &user.Username, &user.Email, &user.FirstName, &user.LastName, &avatarURL, &bio, &user.CreatedAt)
 	

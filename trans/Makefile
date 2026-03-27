@@ -60,10 +60,10 @@ shell-db:
 	docker-compose exec db bash
 
 db-connect:
-	docker-compose exec db mysql -u transcendence -p transcendence
+	docker-compose exec db psql -U transcendence -p transcendence
 
 db-migrate:
-	docker-compose exec db mysql -u transcendence -p transcendence < db/init.sql
+	docker-compose exec db psql -U transcendence -p transcendence < db/init.sql
 
 health-check:
 	@echo "Checking service health..."

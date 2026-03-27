@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"transcendence/modules/user"
@@ -88,7 +88,7 @@ func initDB() (*sql.DB, error) {
 
 	dbPort := os.Getenv("DB_PORT")
 	if dbPort == "" {
-		dbPort = "3306"
+		dbPort = "5432"
 	}
 
 	dbName := os.Getenv("DB_NAME")
@@ -96,10 +96,10 @@ func initDB() (*sql.DB, error) {
 		dbName = "transcendence"
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", 
-		dbUser, dbPassword, dbHost, dbPort, dbName)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
+		dbHost, dbPort, dbUser, dbPassword, dbName)
 
-	db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,6 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -13,14 +13,12 @@ CREATE TABLE IF NOT EXISTS users (
     oauth_id VARCHAR(255),
     oauth_provider VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_username (username),
-    INDEX idx_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+) 
 
 -- Create products/listings table
 CREATE TABLE IF NOT EXISTS listings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     seller_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -38,43 +36,35 @@ CREATE TABLE IF NOT EXISTS listings (
     status ENUM('active', 'sold', 'archived') DEFAULT 'active',
     views_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_seller_id (seller_id),
-    INDEX idx_status (status),
-    INDEX idx_category (category),
-    FULLTEXT INDEX ft_title_description (title, description)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+    FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
+) 
 
 -- Create listing_images table
 CREATE TABLE IF NOT EXISTS listing_images (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     listing_id INT NOT NULL,
     image_url VARCHAR(255) NOT NULL,
     is_primary BOOLEAN DEFAULT FALSE,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
-    INDEX idx_listing_id (listing_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
+) 
 
 -- Create messages table
 CREATE TABLE IF NOT EXISTS messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
     content TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_sender_id (sender_id),
-    INDEX idx_receiver_id (receiver_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+) 
 
 -- Create reviews table
 CREATE TABLE IF NOT EXISTS reviews (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     reviewer_id INT NOT NULL,
     reviewee_id INT NOT NULL,
     listing_id INT,
@@ -83,14 +73,12 @@ CREATE TABLE IF NOT EXISTS reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (reviewee_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL,
-    INDEX idx_reviewee_id (reviewee_id),
-    INDEX idx_reviewer_id (reviewer_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE SET NULL
+) 
 
 -- Create orders table
 CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     buyer_id INT NOT NULL,
     seller_id INT NOT NULL,
     listing_id INT NOT NULL,
@@ -99,18 +87,15 @@ CREATE TABLE IF NOT EXISTS orders (
     status ENUM('pending', 'completed', 'cancelled', 'refunded') DEFAULT 'pending',
     payment_method VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
     FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
-    INDEX idx_buyer_id (buyer_id),
-    INDEX idx_seller_id (seller_id),
-    INDEX idx_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
+) 
 
 -- Create API keys table for authentication
 CREATE TABLE IF NOT EXISTS api_keys (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     key_hash VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
@@ -118,35 +103,29 @@ CREATE TABLE IF NOT EXISTS api_keys (
     rate_limit INT DEFAULT 100,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_used_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_key_hash (key_hash)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) 
 
 -- Create analytics table
 CREATE TABLE IF NOT EXISTS analytics_events (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id INT,
     event_type VARCHAR(50) NOT NULL,
     event_data JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-    INDEX idx_user_id (user_id),
-    INDEX idx_event_type (event_type),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) 
 
 -- Create friendships table
 CREATE TABLE IF NOT EXISTS friendships (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id1 INT NOT NULL,
     user_id2 INT NOT NULL,
     status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id1) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id2) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_friendship (user_id1, user_id2)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (user_id2) REFERENCES users(id) ON DELETE CASCADE
+) 
 
 -- Seed sample users
 INSERT INTO users (username, email, password_hash, first_name, last_name, is_verified) VALUES
@@ -158,7 +137,7 @@ INSERT INTO users (username, email, password_hash, first_name, last_name, is_ver
 ('camera_kingdom', 'camera@example.com', 'hash6', 'Camera', 'Kingdom', TRUE),
 ('gaming_masters', 'gaming@example.com', 'hash7', 'Gaming', 'Masters', TRUE),
 ('furniture_palace', 'furniture@example.com', 'hash8', 'Furniture', 'Palace', TRUE)
-ON DUPLICATE KEY UPDATE id=id;
+ON CONFLICT DO NOTHING;
 
 -- Seed sample products
 INSERT INTO listings (seller_id, title, description, category, price, original_price, location, image, seller_name, rating, reviews, is_new, is_featured, status) VALUES
@@ -170,7 +149,7 @@ INSERT INTO listings (seller_id, title, description, category, price, original_p
 (6, 'Canon EOS 5D Mark IV', 'Professional DSLR camera with 30.4MP full-frame sensor. Like new condition.', 'Electronics', 2200, 2800, 'Sentosa', 'https://images.unsplash.com/photo-1606986628025-35d57e735ae0?w=400&h=300&fit=crop', 'Camera Kingdom', 4.9, 178, FALSE, TRUE, 'active'),
 (7, 'Gaming PC - RTX 3080', 'High-end gaming PC with RTX 3080, i9 processor, 32GB RAM. Runs all games at ultra settings.', 'Electronics', 4500, NULL, 'Cyberjaya', 'https://images.unsplash.com/photo-1587829191301-dc798b83add3?w=400&h=300&fit=crop', 'Gaming Masters', 4.8, 124, TRUE, TRUE, 'active'),
 (8, 'Leather Office Chair', 'Ergonomic leather office chair in black. Perfect for long working hours.', 'Furniture', 450, NULL, 'Mid Valley', 'https://images.unsplash.com/photo-1578500494198-246f612d03b3?w=400&h=300&fit=crop', 'Furniture Palace', 4.4, 56, FALSE, FALSE, 'active')
-ON DUPLICATE KEY UPDATE id=id;
+ON CONFLICT DO NOTHING;
 
 -- Seed basic dummy data for analytics
 INSERT INTO analytics_events (user_id, event_type, event_data) VALUES
@@ -182,11 +161,11 @@ INSERT INTO analytics_events (user_id, event_type, event_data) VALUES
 (6, 'order_placed', '{"listing_id":1,"quantity":1}'),
 (7, 'order_status_updated', '{"order_id":1,"status":"shipped"}'),
 (8, 'review_submitted', '{"listing_id":1,"rating":5}')
-ON DUPLICATE KEY UPDATE id=id;
+ON CONFLICT DO NOTHING;
 
 -- Create analytics table
 CREATE TABLE IF NOT EXISTS analytics (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     event_type VARCHAR(50) NOT NULL,
     listing_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

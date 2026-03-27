@@ -17,7 +17,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -mod=mod -a -installsuffix cgo -o main .
 # Final stage
 FROM alpine:3.18
 
-RUN apk --no-cache add ca-certificates mysql-client
+RUN apk --no-cache add ca-certificates postgresql-client
 
 WORKDIR /app
 
